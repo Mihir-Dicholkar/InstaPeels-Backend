@@ -8,13 +8,13 @@ router.post('/', async (req, res) => {
   try {
     const { userId, product } = req.body;
     const cartItem = {
-  productId: product.productId,
-  title: product.title,
-  price: product.price,
-  quantity: product.quantity,
-  image: product.image, // ✅ legacy
-  images: product.images || [], // ✅ for new format
-};
+      productId: product.productId,
+      title: product.title,
+      price: product.price,
+      quantity: product.quantity,
+      image: product.image, // ✅ legacy
+      images: product.images || [], // ✅ for new format
+    };
 
     let cart = await Cart.findOne({ userId });
 
@@ -46,8 +46,7 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
-
-// DELETE /api/cart/:userId/:productId
+// DELETE single product from cart
 router.delete('/:userId/:productId', async (req, res) => {
   try {
     const { userId, productId } = req.params;
@@ -64,7 +63,7 @@ router.delete('/:userId/:productId', async (req, res) => {
   }
 });
 
-// PUT /api/cart/:userId/:productId
+// Update quantity
 router.put('/:userId/:productId', async (req, res) => {
   try {
     const { userId, productId } = req.params;
@@ -86,6 +85,37 @@ router.put('/:userId/:productId', async (req, res) => {
   }
 });
 
-
+// ✅ CLEAR ENTIRE CART (FIXED)
+router.delete('/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    console.log('🗑️ Attempting to clear cart for userId:', userId);
+    
+    // FIXED: Use 'userId' instead of 'user'
+    const result = await Cart.findOneAndDelete({ userId: userId });
+    
+    if (!result) {
+      console.log('⚠️ Cart not found for userId:', userId);
+      return res.status(404).json({ 
+        success: false, 
+        message: 'Cart not found' 
+      });
+    }
+    
+    console.log('✅ Cart cleared successfully for userId:', userId);
+    
+    res.json({ 
+      success: true, 
+      message: 'Cart cleared successfully' 
+    });
+  } catch (error) {
+    console.error('❌ Error clearing cart:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+});
 
 export default router;

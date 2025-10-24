@@ -13,4 +13,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ✅ GET: Products by Company
+router.get("/company/:companyId", async (req, res) => {
+  try {
+    const { companyId } = req.params;
+    const products = await Product.find({ company: companyId }).populate("company");
+    if (!products || products.length === 0)
+      return res.status(404).json({ message: "No products found for this company." });
+
+    res.json(products);
+  } catch (err) {
+    console.error("GET /products/company/:companyId error:", err);
+    res.status(500).json({ message: "Failed to fetch company products." });
+  }
+});
+
+
 export default router;

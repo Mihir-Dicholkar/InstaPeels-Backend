@@ -48,7 +48,7 @@ router.post('/send-otp', async (req, res) => {
   await user.save();
 
   console.log(`🔐 OTP sent to ${mobile}: ${otpCode}`);
-  res.json({ message: 'OTP sent successfully' });
+res.json({ message: 'OTP sent successfully', otp: otpCode }); 
 });
 
 router.post('/verify-otp', async (req, res) => {
